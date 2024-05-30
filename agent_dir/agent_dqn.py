@@ -250,6 +250,7 @@ class AgentDQN(Agent):
                     reward,
                     observation_,
                 )
+                observation = observation_
                 if len(self.memory) > self.min_train_size:
                     self.train()
                 if done:
