@@ -123,13 +123,15 @@ class AgentDQN(Agent):
         self.target_update_freq = args.target_update_freq
         self.min_train_size = args.min_train_size
         self.epsilon = args.epsilon
+        self.epsilon_decay = args.epsilon_decay
+        self.epsilon_min = args.epsilon_min
         self.action_dim = self.env.action_space.n
         self.state_dim = self.env.observation_space.shape[0]
         self.batch_size = args.batch_size
-        self.writer = SummaryWriter(log_dir=args.log_dir)
-        if not os.path.exists(args.log_dir):
-            print(f"path {args.log_dir} not exists, now touch it")
-            os.makedirs(args.log_dir)
+        self.writer = SummaryWriter(log_dir=args.logdir)
+        if not os.path.exists(args.logdir):
+            print(f"path {args.logdir} not exists, now touch it")
+            os.makedirs(args.logdir)
         # Prepare memory
         self.memory = ReplayBuffer(args.memory_size)
         # build net
@@ -138,7 +140,11 @@ class AgentDQN(Agent):
             self.args.hidden_size,
             self.action_dim,
         ).to(self.device)
-        self.target_net = copy.deepcopy(self.q_net)
+        self.target_net = QNetwork(
+            self.state_dim,
+            self.args.hidden_size,
+            self.action_dim,
+        ).to(self.device)
         self.optimizer = torch.optim.RMSprop(self.q_net.parameters(), lr=self.lr)
         self.loss_fn = nn.MSELoss().to(self.device)
         self.update_count = 0
@@ -169,22 +175,32 @@ class AgentDQN(Agent):
         action = (
             torch.tensor(action, dtype=torch.float).view(-1, 1).to(self.device)
         )  # .view(-1, 1)将action转列向量
+        self.writer.add_scalar("action", torch.sum(action)/self.batch_size, self.update_count)
+        # print(f"action={action[0].item()}",end=',')
         reward = torch.tensor(reward, dtype=torch.float).view(-1, 1).to(self.device)
         observation_ = torch.tensor(observation_, dtype = torch.float).to(self.device)
         # train
-        q_values = self.q_net(observation)
+        q_values = self.q_net(observation).max(1)[0].view(-1, 1)
         target_q_values = self.target_net(observation_).max(1)[0].view(-1, 1)
         q_targets = reward + self.gamma * target_q_values
+        # print(f"q_value={q_values[0].item()}")
+        # print(
+        #     f"q_value={q_values[0].item()},reward = {reward[0].item()},target_q_values={target_q_values[0].item()},qtargets={q_targets[0].item()}"
+        # )
         loss = self.loss_fn(q_values, q_targets)
-        loss_avg = torch.mean(loss)
-        #print(f"avg loss = {loss_avg}")
-        self.writer.add_scalar("loss", loss_avg, self.update_count)  # tensorboardX
+        loss = torch.mean(loss)
+        # print(f"avg loss = {loss_avg}")
+        # if self.update_count % 100 == 0:
+        #     self.writer.add_scalar("loss", loss, self.update_count)  # tensorboardX
         self.optimizer.zero_grad()  
         loss.backward()  # 反向传播更新参数
         self.optimizer.step()
         if self.update_count % self.target_update_freq == 0:
             self.target_net.load_state_dict(self.q_net.state_dict())
         self.update_count += 1
+        self.epsilon -= self.epsilon_decay
+        if self.epsilon < self.epsilon_min:
+            self.epsilon = self.epsilon_min
 
     def make_action(self, observation, test=True):
         """
@@ -219,8 +235,15 @@ class AgentDQN(Agent):
                     self.env.render()
                 action = self.make_action(observation, self.test)
                 observation_, reward, done, info = self.env.step(action)
-                total_reward += reward
-                # x, x_dot, theta, theta_dot = observation_
+                total_reward += 1
+                x, x_dot, theta, theta_dot = observation_
+                x_threshold, theta_threshold_radians = 2.4, 0.20943951023931953
+                # print(f"x={x},theta = {theta}")
+                r1 = (x_threshold - abs(x))/x_threshold - 0.8
+                r2 = (theta_threshold_radians - abs(theta))/theta_threshold_radians - 0.5
+                reward = r1 + r2
+                reward = max(reward, 0)
+                # reward*=100
                 self.memory.push(
                     observation,
                     action,
@@ -230,6 +253,8 @@ class AgentDQN(Agent):
                 if len(self.memory) > self.min_train_size:
                     self.train()
                 if done:
-                    print(f"episode {episode} total reward = {total_reward}")
+                    # print(f"episode {episode} total reward = {total_reward}")
                     self.writer.add_scalar("total_reward", total_reward, episode)
+                    # print("restart")
+                    # self.writer.add_scalar("epsilon", self.epsilon, self.update_count)
                     break

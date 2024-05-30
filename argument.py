@@ -10,21 +10,23 @@ def dqn_arguments(parser):
     parser.add_argument('--env_name', default="CartPole-v0", help='environment name')
 
     parser.add_argument("--seed", default=11037, type=int)
-    parser.add_argument("--hidden_size", default=16, type=int)
-    parser.add_argument("--lr", default=0.02, type=float)
-    parser.add_argument("--gamma", default=0.99, type=float)
-    parser.add_argument("--grad_norm_clip", default=10, type=float)
+    parser.add_argument("--hidden_size", default=20, type=int)
+    parser.add_argument("--lr", default=0.001, type=float)
+    parser.add_argument("--gamma", default=0.8, type=float)
+    # parser.add_argument("--grad_norm_clip", default=10, type=float)
 
     parser.add_argument("--test", default=False, type=bool)
     parser.add_argument("--use_cuda", default=True, type=bool)
     parser.add_argument("--n_frames", default=int(30000), type=int)
-    parser.add_argument("--memory_size", default=500, type=int)
+    parser.add_argument("--memory_size", default=5000, type=int)
     parser.add_argument("--render", default=False, type=bool)
-    parser.add_argument("--target_update_freq", default=10, type=int)
-    parser.add_argument("--min_train_size", default=250, type=int)
-    parser.add_argument("--epsilon", default=0.01, type=float)
-    parser.add_argument("--batch_size", default=64, type=int)
-    parser.add_argument("--log_dir", default="./log", type=str)
+    parser.add_argument("--target_update_freq", default=50, type=int)
+    parser.add_argument("--min_train_size", default=260, type=int)
+    parser.add_argument("--epsilon", default=0.9, type=float)
+    parser.add_argument("--epsilon_decay", default=0.00005, type=float)
+    parser.add_argument("--epsilon_min", default=0.2, type=float)
+    parser.add_argument("--batch_size", default=256, type=int)
+    parser.add_argument("--logdir", default="./log", type=str)
     return parser
 
 
