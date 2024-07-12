@@ -17,7 +17,7 @@ def dqn_arguments(parser):
 
     parser.add_argument("--test", default=False, type=bool)
     parser.add_argument("--use_cuda", default=True, type=bool)
-    parser.add_argument("--n_frames", default=int(30000), type=int)
+    parser.add_argument("--n_frames", default=int(300), type=int)
     parser.add_argument("--memory_size", default=10000, type=int)
     parser.add_argument("--render", default=False, type=bool)
     parser.add_argument("--target_update_freq", default=10, type=int)

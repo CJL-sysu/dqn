@@ -175,7 +175,7 @@ class AgentDQN(Agent):
         action = (
             torch.tensor(action, dtype=torch.float).view(-1, 1).to(self.device)
         )  # .view(-1, 1)将action转列向量
-        self.writer.add_scalar("action", torch.sum(action)/self.batch_size, self.update_count)
+        #self.writer.add_scalar("action", torch.sum(action)/self.batch_size, self.update_count)
         # print(f"action={action[0].item()}",end=',')
         reward = torch.tensor(reward, dtype=torch.float).view(-1, 1).to(self.device)
         observation_ = torch.tensor(observation_, dtype = torch.float).to(self.device)
@@ -227,6 +227,7 @@ class AgentDQN(Agent):
         ##################
         # YOUR CODE HERE #
         ##################
+        ret = []
         for episode in range(self.args.n_frames):
             observation = self.env.reset()
             total_reward = 0
@@ -255,7 +256,9 @@ class AgentDQN(Agent):
                     self.train()
                 if done:
                     # print(f"episode {episode} total reward = {total_reward}")
-                    self.writer.add_scalar("total_reward", total_reward, episode)
+                    # self.writer.add_scalar("total_reward", total_reward, episode)
+                    ret.append(total_reward)
                     # print("restart")
                     # self.writer.add_scalar("epsilon", self.epsilon, self.update_count)
                     break
+        return ret

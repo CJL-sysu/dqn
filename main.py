@@ -29,7 +29,14 @@ def run(args):
         agent = AgentDQN(env, args)
         agent.run()
 
-
+from plot import plot_vectors
 if __name__ == '__main__':
     args = parse()
-    run(args)
+    arr = []
+    for i in range(3):
+        args.seed += i
+        a = run(args)
+        arr.append(a)
+    print(arr)
+    plot_vectors(arr[0], arr[1], arr[2], args.seed - 2, args.seed - 1, args.seed)
+    #run(args)
