@@ -228,6 +228,8 @@ class AgentDQN(Agent):
         # YOUR CODE HERE #
         ##################
         ret = []
+        from time import time
+        start_time = time()
         for episode in range(self.args.n_frames):
             observation = self.env.reset()
             total_reward = 0
@@ -256,7 +258,9 @@ class AgentDQN(Agent):
                     self.train()
                 if done:
                     # print(f"episode {episode} total reward = {total_reward}")
-                    # self.writer.add_scalar("total_reward", total_reward, episode)
+                    self.writer.add_scalar(f"total_reward_seed={self.args.seed}", total_reward, episode)
+                    end_time = time()
+                    print(f"episode {episode} total reward = {total_reward}, time = {end_time-start_time}")
                     ret.append(total_reward)
                     # print("restart")
                     # self.writer.add_scalar("epsilon", self.epsilon, self.update_count)

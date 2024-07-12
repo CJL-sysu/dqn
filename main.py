@@ -20,23 +20,24 @@ def run(args):
         env = gym.make(env_name)
         from agent_dir.agent_pg import AgentPG
         agent = AgentPG(env, args)
-        agent.run()
+        return agent.run()
 
     if args.train_dqn:
         env_name = args.env_name
         env = gym.make(env_name)
         from agent_dir.agent_dqn import AgentDQN
         agent = AgentDQN(env, args)
-        agent.run()
+        return agent.run()
 
 from plot import plot_vectors
 if __name__ == '__main__':
     args = parse()
     arr = []
     for i in range(3):
+        print(f"--------第{i}轮训练开始---------")
         args.seed += i
         a = run(args)
         arr.append(a)
     print(arr)
     plot_vectors(arr[0], arr[1], arr[2], args.seed - 2, args.seed - 1, args.seed)
-    #run(args)
+    # run(args)
