@@ -6,9 +6,9 @@ def get_var(vector):
     ret = []
     for i in range(len(vector)):
         if i - length < 0:
-            ret.append(np.var(vector[:i+1]))
+            ret.append(np.std(vector[:i+1]))
         else:
-            ret.append(np.var(vector[i-length:i+1]))
+            ret.append(np.std(vector[i-length:i+1]))
     return ret
 
 def plot_vectors(vector1, vector2, vector3, seed1, seed2, seed3, filename="plot.png"):
