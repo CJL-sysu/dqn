@@ -21,6 +21,7 @@ def pinghua(vector):
             ret.append(np.average(vector[: i + 1]))
         else:
             ret.append(np.average(vector[i - length : i + 1]))
+    return ret
 
 
 def plot_vectors(vector1, vector2, vector3, seed1, seed2, seed3, filename="plot.png"):
@@ -32,9 +33,9 @@ def plot_vectors(vector1, vector2, vector3, seed1, seed2, seed3, filename="plot.
     var2 = get_var(vector2)
     var3 = get_var(vector3)
     # print(var1, var2, var3)
-    plt.plot(var1, color="red", linestyle="--", label=f"{seed1}standard deviation")
-    plt.plot(var2, color="green", linestyle="--", label=f"{seed2}standard deviation")
-    plt.plot(var3, color="blue", linestyle="--", label=f"{seed3}standard deviation")
+    plt.plot(var1, color="red", linestyle="--", label=f"standard deviation with seed {seed1}")
+    plt.plot(var2, color="green", linestyle="--", label=f"standard deviation with seed {seed2}")
+    plt.plot(var3, color="blue", linestyle="--", label=f"standard deviation with seed {seed3}")
     vector1 = pinghua(vector1)
     vector2 = pinghua(vector2)
     vector3 = pinghua(vector3)

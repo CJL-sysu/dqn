@@ -9,7 +9,7 @@ def dqn_arguments(parser):
     """
     parser.add_argument('--env_name', default="CartPole-v0", help='environment name')
 
-    parser.add_argument("--seed", default=11037, type=int)
+    parser.add_argument("--seed", default=1314519, type=int)
     parser.add_argument("--hidden_size", default=80, type=int)
     parser.add_argument("--lr", default=0.002, type=float)
     parser.add_argument("--gamma", default=0.8, type=float)
